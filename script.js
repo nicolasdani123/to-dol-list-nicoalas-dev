@@ -1,82 +1,194 @@
-// Seleção de elementos
-const button = document.querySelector(".button");
-const input = document.querySelector(".input");
-const dataContainer = document.querySelector(".data-container");
-const ul = document.querySelector(".list");
+const toDoList = {
+  textDate: document.querySelector(".textDate"),
+  textHours: document.querySelector(".textHours"),
+  containerInput: document.querySelector(".container-input"),
+  button: document.querySelector(".button-add"),
+  img: document.querySelector(".img-button-remove"),
+  input: document.querySelector(".input-task"),
+  ul: document.querySelector(".ul"),
+  key: "toDoList",
 
-// Lista completa de meses
-const meses = [
-    "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-    "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
-];
+  createDate() {
+    const meses = [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ];
 
-// Função para exibir a data
-function date() {
-    const dataNewDate = new Date();
-    const day = dataNewDate.getDate();
-    const month = meses[dataNewDate.getMonth()];
-    const year = dataNewDate.getFullYear();
+    const date = new Date();
+    const Day = date.getDate();
+    const month = meses[date.getMonth()];
+    const year = date.getFullYear();
 
-    const p = document.createElement("p");
-    p.textContent = `${day} ${month} ${year}`;
+    const total = `${Day} ${month} ${year}`;
 
-    console.log(p);
-    dataContainer.appendChild(p);
-}
+    this.textDate.innerHTML = total;
+  },
 
-// Função para exibir o horário atualizado
-function hours() {
-    const p = document.createElement("p");
-    dataContainer.appendChild(p);
+  createHours() {
+    const date = new Date();
 
-    setInterval(() => {
-        const data = new Date();
-        const hours = data.getHours().toString().padStart(2, "0");
-        const minutes = data.getMinutes().toString().padStart(2, "0");
-        const seconds = data.getSeconds().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
 
-        p.textContent = `${hours}:${minutes}:${seconds}`;
-    }, 1000);
-}
+    const total = `${hours}:${minutes}:${seconds}`;
+    this.textHours.innerHTML = total;
+  },
 
-// Função para adicionar itens à lista
-function list() {
-    if (input.value.trim() !== "") { // Evita adicionar itens vazios
-        const li = document.createElement("li");
-        const checkbox = document.createElement("input");
-        const label = document.createElement("label");
+  setSuccess(element) {
+    element.classList.add("success");
+    element.classList.remove("error");
+  },
+  setError(element) {
+    element.classList.add("error");
+    element.classList.remove("success");
+  },
 
-        checkbox.type = "checkbox";
-        checkbox.classList.add("checkbox");
-
-        label.textContent = input.value;
-
-        li.appendChild(checkbox);
-        li.appendChild(label);
-        ul.appendChild(li);
-
-        label.addEventListener("click", () => {
-            checkbox.checked = !checkbox.checked
-        });
-
-        input.value = ""; // Limpa o campo de entrada após adicionar o item
+  inputValidator() {
+    const inputValue = this.input.value.trim();
+    if (!inputValue) {
+      this.setError(this.input);
+      return null;
     }
-}
+    this.setSuccess(this.input);
+    return inputValue;
+  },
 
-// Função de inicialização
-function init() {
-    hours();
-    date();
-}
+  getLocalStorage(key) {
+    const storageData = JSON.parse(localStorage.getItem(key)) || [];
+    return storageData;
+  },
+  setLocalStorage(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  },
+  taskValue() {
+    const inputValue = this.inputValidator();
+    if (!inputValue) return;
+    const task = {
+      value: inputValue,
+      id: Date.now(),
+    };
+    this.input.value = "";
+    return task;
+  },
 
-init();
+  saveLocalStorage() {
+    const task = this.taskValue();
+    if (!task) return;
+    const storageData = this.getLocalStorage(this.key);
+    storageData.push(task);
+    this.setLocalStorage(this.key, storageData);
+    this.renderTask(task);
+  },
 
-// Evento de clique no botão para alternar visibilidade do input
-button.addEventListener("click", () => {
-    input.classList.toggle("hidden");
-});
+  renderTask(task) {
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.textContent = task.value;
+    li.appendChild(span);
+    this.ul.appendChild(li);
 
-// Evento para adicionar item à lista quando o input mudar
-input.addEventListener("change", () => {
-    list();
-});
+    const buttonEdit = document.createElement("button");
+    li.appendChild(buttonEdit);
+    this.renderEdit(buttonEdit, span, task);
+
+    const buttonRemove = document.createElement("button");
+    li.appendChild(buttonRemove);
+    this.renderRemove(buttonRemove, task);
+  },
+
+  renderEdit(buttonEdit, span, task) {
+    buttonEdit.textContent = `editar`;
+    buttonEdit.classList.add("button-edit");
+
+    buttonEdit.addEventListener("click", () => {
+      if (document.querySelector(".input-edit")) return;
+
+      const inputDefault = this.input;
+      inputDefault.style.display = "none";
+
+      const inputEdit = document.createElement("input");
+      inputEdit.classList.add("input-edit");
+      inputEdit.type = "text";
+      inputEdit.placeholder = "editando...";
+      inputEdit.value = span.textContent;
+      inputDefault.parentElement.insertBefore(
+        inputEdit,
+        inputDefault.nextElementSibling
+      );
+      inputEdit.focus();
+      const btnRemove = document.querySelector(".button-remove");
+      btnRemove.disabled = true;
+
+      const newTaskStorage = () => {
+        const dataStorage = this.getLocalStorage(this.key);
+        dataStorage.map((items) => {
+          if (items.id === task.id) {
+            items.value = inputEdit.value;
+            return items.value;
+          }
+        });
+        this.setLocalStorage(this.key, dataStorage);
+      };
+
+      const saveEdit = () => {
+        newTaskStorage();
+        inputDefault.style.display = "block";
+        inputEdit.remove();
+        span.textContent = inputEdit.value;
+        btnRemove.disabled = false;
+      };
+
+      inputEdit.addEventListener("blur", saveEdit);
+      inputEdit.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          saveEdit();
+        }
+      });
+    });
+  },
+
+  renderRemove(buttonRemove, task) {
+    buttonRemove.textContent = `remover`;
+    buttonRemove.classList.add("button-remove");
+    buttonRemove.addEventListener("click", () => {
+      const storageData = this.getLocalStorage(this.key);
+      const storageDatafiltered = storageData.filter(
+        (items) => items.id !== task.id
+      );
+      this.setLocalStorage(this.key, storageDatafiltered);
+      buttonRemove.parentElement.remove();
+    });
+  },
+  loadTaskLocalStorage() {
+    const storageData = this.getLocalStorage(this.key);
+    storageData.forEach((items) => this.renderTask(items));
+  },
+
+  load() {
+    // fucntion executar data
+    this.createDate();
+
+    // executa a function createHours  a todo momento
+    setInterval(() => {
+      this.createHours();
+    }, 1000);
+
+    // carrega dados armazenados no localStorage  para tela
+    this.loadTaskLocalStorage();
+  },
+};
+toDoList.load();
+
+const { button } = toDoList;
+button.addEventListener("click", () => toDoList.saveLocalStorage());

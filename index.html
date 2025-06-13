@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+  <body>
+    <main class="container-main">
+      <section class="container-textH2">
+        <h2 class="textDate" title="data de hoje"></h2>
+        <h2 class="textHours" title="horas"></h2>
+      </section>
 
-<body>
-  <div class="data-container">
+      <section class="container-input">
+        <input
+          type="text"
+          placeholder="digite uma tarefa..."
+          class="input-task"
+        />
+        <button class="button-add">
+          <img
+            src="img/icons8-plus-math-50.png"
+            alt=""
+            class="img-button-remove"
+          />
+        </button>
+      </section>
 
-    
-    
-  </div>
-  
-  
-  
-  <button class="button"> <img class="img-math" src="img/icons8-plus-math-50.png" alt=""></button>
-  <h2>to-do-list - by nicholas</h2>
-  
-  <div class="list-container">
-    <input type="text" class="hidden input" placeholder="nova tarefa ...">
-    <ul class="list">
-      
-
-    </ul>
-
-  </div>
-
-
-  <script src="script.js"> </script>
-</body>
-
+      <section class="show-task">
+        <ul class="ul"></ul>
+      </section>
+    </main>
+  </body>
+  <script src="script.js"></script>
 </html>
