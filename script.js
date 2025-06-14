@@ -93,6 +93,7 @@ const toDoList = {
 
   renderTask(task) {
     const li = document.createElement("li");
+    li.style.cursor = "pointer";
     const span = document.createElement("span");
     span.textContent = task.value;
     li.appendChild(span);
@@ -105,13 +106,19 @@ const toDoList = {
     const buttonRemove = document.createElement("button");
     li.appendChild(buttonRemove);
     this.renderRemove(buttonRemove, task);
+
+    li.addEventListener("click", (e) => {
+      e.stopPropagation();
+      span.classList.toggle("span");
+    });
   },
 
   renderEdit(buttonEdit, span, task) {
     buttonEdit.textContent = `editar`;
     buttonEdit.classList.add("button-edit");
 
-    buttonEdit.addEventListener("click", () => {
+    buttonEdit.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (document.querySelector(".input-edit")) return;
 
       const inputDefault = this.input;
@@ -119,9 +126,15 @@ const toDoList = {
 
       const inputEdit = document.createElement("input");
       inputEdit.classList.add("input-edit");
+      inputEdit.addEventListener("input", () => {
+        inputEdit.value = inputEdit.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, "");
+      });
+
       inputEdit.type = "text";
       inputEdit.placeholder = "editando...";
       inputEdit.value = span.textContent;
+      inputEdit.maxLength = 28;
+
       inputDefault.parentElement.insertBefore(
         inputEdit,
         inputDefault.nextElementSibling
@@ -132,10 +145,9 @@ const toDoList = {
 
       const newTaskStorage = () => {
         const dataStorage = this.getLocalStorage(this.key);
-        dataStorage.map((items) => {
+        dataStorage.forEach((items) => {
           if (items.id === task.id) {
             items.value = inputEdit.value;
-            return items.value;
           }
         });
         this.setLocalStorage(this.key, dataStorage);
@@ -147,6 +159,7 @@ const toDoList = {
         inputEdit.remove();
         span.textContent = inputEdit.value;
         btnRemove.disabled = false;
+        span.classList.remove("span");
       };
 
       inputEdit.addEventListener("blur", saveEdit);
@@ -174,6 +187,11 @@ const toDoList = {
     const storageData = this.getLocalStorage(this.key);
     storageData.forEach((items) => this.renderTask(items));
   },
+  regex() {
+    this.input.addEventListener("input", () => {
+      this.input.value = this.input.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, "");
+    });
+  },
 
   load() {
     // fucntion executar data
@@ -184,11 +202,16 @@ const toDoList = {
       this.createHours();
     }, 1000);
 
-    // carrega dados armazenados no localStorage  para tela
     this.loadTaskLocalStorage();
+    this.regex();
   },
 };
 toDoList.load();
 
-const { button } = toDoList;
+const { button, input } = toDoList;
 button.addEventListener("click", () => toDoList.saveLocalStorage());
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    toDoList.saveLocalStorage();
+  }
+});

@@ -56,11 +56,11 @@ body {
 
 .ul li {
   background-color: aliceblue;
-  width: 18rem;
+  width: 25rem;
   height: 2.5rem;
   display: flex;
   align-items: center;
-  padding: 0 0 0 2rem;
+  padding: 0 0 0 1rem;
   position: relative;
 }
 
@@ -73,7 +73,7 @@ body {
   color: white;
   transition: 0.3s ease-in;
   position: absolute;
-  left: 13rem;
+  left: 20rem;
 }
 
 .button-remove:hover {
@@ -100,7 +100,7 @@ body {
   color: white;
   transition: 0.3s ease-in;
   position: absolute;
-  left: 8rem;
+  left: 15rem;
 }
 
 .input-edit {
@@ -113,4 +113,35 @@ body {
 
 .hidden {
   display: none;
+}
+
+@media (max-width:600px){
+ 
+  .container-textH2{
+    margin: 3rem   2rem ;
+  }
+  .ul li{
+    
+    width: 20rem;
+ 
+  }
+  .button-edit{
+    position: static;
+    margin: 0 0 0 6rem;
+  }
+
+  .button-remove{
+    position: static;
+   
+  }
+  .ul li {
+    display: flex;
+    justify-content: space-around;
+
+}
+}
+.span {
+  text-decoration: line-through;
+  color: green;
+
 }
